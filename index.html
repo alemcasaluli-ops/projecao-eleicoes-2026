@@ -376,6 +376,34 @@
         </div>
       </section>
 
+
+      <section aria-labelledby="polymarket">
+        <h2 id="polymarket">Polymarket — o que o mercado está precificando</h2>
+        <p class="sec-note">
+          Preços ao vivo da Polymarket, atualizados junto com a página. Um preço de 69¢ significa que o mercado
+          atribui cerca de 69% de chance àquele resultado. Mercado não é apuração: ele reage a cada trade e pode
+          divergir — e muito — do resultado parcial das urnas. Fonte: Polymarket, evento "Brazil Presidential Election".
+        </p>
+        <div class="board">
+          <article class="cand bolso">
+            <div class="body">
+              <div class="who"><span class="name">Flávio Bolsonaro</span><span class="ballot">vencer a eleição</span></div>
+              <div class="proj"><span class="pct" id="poly-bolso">—</span><span class="waiting" id="poly-bolso-lbl">carregando preço…</span></div>
+              <div class="real" id="poly-bolso-vol">Volume no mercado: —</div>
+            </div>
+          </article>
+          <article class="cand lula">
+            <div class="body">
+              <div class="who"><span class="name">Lula</span><span class="ballot">vencer a eleição</span></div>
+              <div class="proj"><span class="pct" id="poly-lula">—</span><span class="waiting" id="poly-lula-lbl">carregando preço…</span></div>
+              <div class="real" id="poly-lula-vol">Volume no mercado: —</div>
+            </div>
+          </article>
+        </div>
+        <p class="sec-note" style="margin-top:14px"><strong>Margem do 2º turno, segundo o mercado:</strong> <span id="poly-margem">carregando…</span></p>
+        <p class="sec-note" id="poly-updated">Preços da Polymarket: aguardando primeira leitura.</p>
+      </section>
+
       <section aria-labelledby="mapa-votos">
         <h2 id="mapa-votos">De onde vêm os votos: o mapa de calor</h2>
         <p class="sec-note">
@@ -666,14 +694,47 @@
             if (st) st.textContent = 'APURAÇÃO DEFINIDA — ' + pct(d.secoes_pct) + ' das seções apuradas';
           }
         }
+
+        function carregarPoly() {
+          fetch('https://gamma-api.polymarket.com/events?slug=brazil-presidential-election')
+            .then(function (r) { return r.json(); })
+            .then(function (evs) {
+              var mk = {};
+              (evs[0] && evs[0].markets || []).forEach(function (m) { mk[m.slug] = m; });
+              function yesPrice(slug) {
+                var m = mk[slug]; if (!m || !m.outcomePrices) return null;
+                var p = JSON.parse(m.outcomePrices); return { price: parseFloat(p[0]), vol: parseFloat(m.volume || 0) };
+              }
+              var b = yesPrice('will-flvio-bolsonaro-win-the-2026-brazilian-presidential-election');
+              var l = yesPrice('will-luiz-incio-lula-da-silva-win-the-2026-brazilian-presidential-election');
+              if (b) { setText('poly-bolso', (b.price * 100).toFixed(1).replace('.', ',') + '¢'); setText('poly-bolso-lbl', 'de chance, segundo o mercado'); setText('poly-bolso-vol', 'Volume no mercado: US$ ' + fmt(b.vol)); }
+              if (l) { setText('poly-lula', (l.price * 100).toFixed(1).replace('.', ',') + '¢'); setText('poly-lula-lbl', 'de chance, segundo o mercado'); setText('poly-lula-vol', 'Volume no mercado: US$ ' + fmt(l.vol)); }
+              if (b || l) setText('poly-updated', 'Preços da Polymarket atualizados às ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) + '.');
+            })
+            .catch(function () { setText('poly-updated', 'Não foi possível ler os preços da Polymarket agora; tentando de novo em 60 s.'); });
+          fetch('https://gamma-api.polymarket.com/events?slug=brazil-presidential-election-second-round-margin-of-victory')
+            .then(function (r) { return r.json(); })
+            .then(function (evs) {
+              var list = (evs[0] && evs[0].markets || []).map(function (m) {
+                var p = m.outcomePrices ? JSON.parse(m.outcomePrices)[0] : 0;
+                var q = m.question.replace('Will Flávio Bolsonaro win the second round of the 2026 Brazilian presidential election by ', 'Bolsonaro ')
+                  .replace('Will Luiz Inácio Lula da Silva win the second round of the 2026 Brazilian presidential election by ', 'Lula ')
+                  .replace('less than 4%?', 'por menos de 4%').replace('at least 12%?', 'por 12% ou mais').replace('by ', 'por ').replace('?', '');
+                return { q: q, p: parseFloat(p) };
+              }).filter(function (x) { return x.p > 0.01 && x.q.indexOf('another person') < 0; })
+                .sort(function (a, b) { return b.p - a.p; }).slice(0, 4);
+              setText('poly-margem', list.map(function (x) { return x.q + ' ' + (x.p * 100).toFixed(1).replace('.', ',') + '%'; }).join(' · '));
+            })
+            .catch(function () {});
+        }
         function carregar() {
           fetch('dados.json?t=' + Date.now(), { cache: 'no-store' })
             .then(function (r) { return r.json(); })
             .then(render)
             .catch(function () { /* mantem a versao anterior na tela */ });
         }
-        carregar();
-        setInterval(carregar, 60000);
+        carregar(); carregarPoly();
+        setInterval(carregar, 60000); setInterval(carregarPoly, 60000);
       })();
     </script>
 
