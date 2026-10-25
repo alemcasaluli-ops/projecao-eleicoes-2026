@@ -87,7 +87,9 @@ def main():
         "ufs_sem_dados": sem_dados,
         "estados": estados,
     }
-    os.makedirs(os.path.dirname(saida), exist_ok=True)
+    _d = os.path.dirname(saida)
+    if _d:
+        os.makedirs(_d, exist_ok=True)
     json.dump(out, open(saida, "w"), ensure_ascii=False)
     print(f"dados.json escrito: {100*frac:.1f}% apurado, {tot_v} votos validos, "
           f"projecao {share(proj_tot, tot_p)}")
