@@ -295,13 +295,7 @@
 
       <section aria-labelledby="placar">
         <h2 id="placar">Placar — apuração crua e projeção</h2>
-        <p class="sec-note">
-          Cada cartão traz as duas informações juntas: em cima, a <strong>apuração crua</strong> — soma direta
-          do que o TSE já totalizou até esta rodada (14h07), sem projetar; embaixo, a <strong>projeção</strong>,
-          que extrapola esse resultado para as seções que faltam. A projeção aparece assim que as primeiras
-          seções forem totalizadas, a partir das 17h. Até lá, cada cartão mostra também o resultado do candidato
-          no 1º turno, como referência.
-        </p>
+
 
         <div class="board">
           <article class="cand bolso">
@@ -357,29 +351,9 @@
           </article>
         </div>
 
-        <div class="raw-total">
-          <span class="rt-label">Total já apurado</span>
-          <span>Votos válidos somados: <b id="total-validos">0</b></span>
-          <span>Seções apuradas: <b id="total-secoes">0,0%</b></span>
-          <span>Apuração ainda não iniciada — começa às 17h, com o fechamento das urnas.</span>
-        </div>
 
-        <div class="progress-block">
-          <div class="progress-head">
-            <span class="t">Seções apuradas no país</span>
-            <span class="v">0,0%</span>
-          </div>
-          <div class="track" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Seções apuradas no país">
-            <div class="fill"></div>
-          </div>
-          <p>A votação vai até as 17h (horário de Brasília). A totalização das seções começa com o fechamento das urnas, e as rodadas de projeção saem a cada 10 minutos daí em diante.</p>
-        </div>
-      </section>
-
-
-      <section aria-labelledby="polymarket">
-        <h2 id="polymarket">Polymarket — o que o mercado está precificando</h2>
-        <p class="sec-note">
+        <div class="poly-no-placar">
+<p class="sec-note">
           Preços ao vivo da Polymarket, atualizados junto com a página. Um preço de 69¢ significa que o mercado
           atribui cerca de 69% de chance àquele resultado. Mercado não é apuração: ele reage a cada trade e pode
           divergir — e muito — do resultado parcial das urnas. Fonte: Polymarket, evento "Brazil Presidential Election".
@@ -402,7 +376,28 @@
         </div>
         <p class="sec-note" style="margin-top:14px"><strong>Margem do 2º turno, segundo o mercado:</strong> <span id="poly-margem">carregando…</span></p>
         <p class="sec-note" id="poly-updated">Preços da Polymarket: aguardando primeira leitura.</p>
+        </div>
+
+        <div class="raw-total">
+          <span class="rt-label">Total já apurado</span>
+          <span>Votos válidos somados: <b id="total-validos">0</b></span>
+          <span>Seções apuradas: <b id="total-secoes">0,0%</b></span>
+          <span>Apuração ainda não iniciada — começa às 17h, com o fechamento das urnas.</span>
+        </div>
+
+        <div class="progress-block">
+          <div class="progress-head">
+            <span class="t">Seções apuradas no país</span>
+            <span class="v">0,0%</span>
+          </div>
+          <div class="track" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Seções apuradas no país">
+            <div class="fill"></div>
+          </div>
+          <p>A votação vai até as 17h (horário de Brasília). A totalização das seções começa com o fechamento das urnas, e as rodadas de projeção saem a cada 10 minutos daí em diante.</p>
+        </div>
       </section>
+
+
 
       <section aria-labelledby="mapa-votos">
         <h2 id="mapa-votos">De onde vêm os votos: o mapa de calor</h2>
