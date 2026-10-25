@@ -1,0 +1,36 @@
+name: Atualizar dados da apuração
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  atualizar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Parar se a apuração já está definida
+        id: definida
+        run: |
+          if python3 -c "import json,sys; sys.exit(0 if json.load(open('dados.json')).get('definida') else 1)" 2>/dev/null; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Gerar dados.json a partir do TSE
+        if: steps.definida.outputs.skip != 'true'
+        env:
+          TSE_ELEICAO_2T_ID: "6258"
+        run: python3 gerar_dados.py dados.json
+      - name: Commitar se mudou
+        if: steps.definida.outputs.skip != 'true'
+        run: |
+          git config user.name "apuracao-bot"
+          git config user.email "apuracao-bot@users.noreply.github.com"
+          git add dados.json
+          git diff --cached --quiet || git commit -m "Atualiza dados $(date -u +%H:%M) UTC"
+          git push
